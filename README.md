@@ -1,3 +1,26 @@
+# HermeStrata-2xV100
+
+> **Successor of [HermeStrata](https://github.com/urawazakun/HermeStrata)** (frozen, the one-V100 edition). This repo starts from its final
+> state (`f9137fd`, 2026-10-03) and continues on a machine with **two Tesla V100 16 GB** (Windows, driver 472.12, CUDA 11.8, sm_70).
+>
+> **Honest status (2026-10-03):** the second card was installed today. Production still runs on one card (GPU 0, FlashNext at
+> 262K context); GPU 1 is idle. Nothing in the patches below uses two cards yet, and every measurement below was taken on one V100.
+> Planned use of the second card: (1) a fast stateless *decision model* (Cloudflare Clef, Jev-compatible) for the roguelike player,
+> swapped in/out of the first card by freezing Strata's VRAM in host RAM (PARK/UNPARK), or running on the second card; (2) engine
+> work on upstream Strata 0.1.36 (rebase of this series in progress, GPU acceptance pending). See the "Two-card plan" section.
+
+## Two-card plan (not done yet)
+| item | state |
+|---|---|
+| Strata 0.1.36 rebase of patches 0001-0021 (CUDA 11.8 / Windows port kept) | source ready, CUDA build + GPU acceptance pending |
+| PARK/UNPARK: copy the engine's VRAM to host RAM, free it, run another model, restore exactly (saved states stay in RAM) | design only (feasibility of CUDA VMM on driver 472.12 unknown) |
+| Clef 27B decision model (NF4 / offload on torch 2.7.1+cu118) as the game player, FlashNext writes plans only | feasibility study done (briefs not published); full 27B load not measured |
+| Which engine uses which card (config has no GPU index today) | not decided |
+
+The text below is the one-V100 edition, kept as the baseline.
+
+---
+
 # HermeStrata
 
 A local agent stack for **one user, one GPU, one serialized engine slot with multiple cached conversation lines**:
